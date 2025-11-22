@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>CueCube Wholesale – Catalog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body data-page="products">
+  <header class="top-bar">
+    <div class="top-bar-inner">
+      <div class="brand-wrap">
+        <a href="products.html" class="brand-title-link">CUECUBE WHOLESALE</a>
+      </div>
+      <nav class="top-nav">
+        <span>Catalog</span>
+        <button id="logoutBtn" class="top-nav-btn">Logout</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page page-split">
+    <section class="panel">
+      <h1>Wholesale catalog</h1>
+      <p>All items are $15.00 each. Minimum order 10 pcs. 50+ → 15% off. 100+ → extra 15%.</p>
+
+      <div class="product-list">
+
+        <article class="product-card" data-product-id="dime353">
+          <h2>CueCube tip shaper – Dime (8.96 mm)</h2>
+          <p class="sku">SKU: CC-DIME-896</p>
+          <p class="desc">
+            Original CueCube aluminum body with abrasive insert. Dime radius for precise cue tip shaping.
+          </p>
+          <div class="product-row">
+            <span class="price">$15.00</span>
+            <label class="qty-label">
+              Qty
+              <input type="number" class="qty-input" value="10" min="10" step="5" />
+            </label>
+          </div>
+          <div class="product-actions">
+            <button
+              class="btn-secondary view-btn"
+              type="button"
+              data-product-view="dime353"
+            >
+              View
+            </button>
+            <button
+              class="btn-primary add-btn"
+              type="button"
+              data-product-id="dime353"
+              data-name="CueCube Dime 8.96 mm"
+              data-price="15"
+              data-min="10"
+            >
+              Add to order
+            </button>
+          </div>
+        </article>
+
+        <article class="product-card" data-product-id="nickel418">
+          <h2>CueCube tip shaper – Nickel (10.6 mm)</h2>
+          <p class="sku">SKU: CC-NICKEL-106</p>
+          <p class="desc">
+            Nickel radius version of the CueCube for players preferring a slightly flatter tip profile.
+          </p>
+          <div class="product-row">
+            <span class="price">$15.00</span>
+            <label class="qty-label">
+              Qty
+              <input type="number" class="qty-input" value="10" min="10" step="5" />
+            </label>
+          </div>
+          <div class="product-actions">
+            <button
+              class="btn-secondary view-btn"
+              type="button"
+              data-product-view="nickel418"
+            >
+              View
+            </button>
+            <button
+              class="btn-primary add-btn"
+              type="button"
+              data-product-id="nickel418"
+              data-name="CueCube Nickel 10.6 mm"
+              data-price="15"
+              data-min="10"
+            >
+              Add to order
+            </button>
+          </div>
+        </article>
+
+        <article class="product-card" data-product-id="keychain">
+          <h2>CueCube keychain – Nickel (10.6 mm)</h2>
+          <p class="sku">SKU: CC-KEYCHAIN-106</p>
+          <p class="desc">
+            Pocket-size CueCube on a keychain. Same abrasive as the full-size Nickel model.
+          </p>
+          <div class="product-row">
+            <span class="price">$15.00</span>
+            <label class="qty-label">
+              Qty
+              <input type="number" class="qty-input" value="10" min="10" step="5" />
+            </label>
+          </div>
+          <div class="product-actions">
+            <button
+              class="btn-secondary view-btn"
+              type="button"
+              data-product-view="keychain"
+            >
+              View
+            </button>
+            <button
+              class="btn-primary add-btn"
+              type="button"
+              data-product-id="keychain"
+              data-name="CueCube keychain 10.6 mm"
+              data-price="15"
+              data-min="10"
+            >
+              Add to order
+            </button>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <aside class="panel panel-cart">
+      <h2>Your order</h2>
+      <div id="cartItems" class="cart-items"></div>
+      <div class="cart-summary-row">
+        <span>Subtotal (before shipping)</span>
+        <span id="cartTotal">$0.00</span>
+      </div>
+      <button id="checkoutBtn" class="btn-primary btn-full">Proceed to checkout</button>
+      <p class="hint">
+        Discounts are applied on the final invoice: 15% off at 50+ pcs, extra 15% off at 100+ pcs.
+      </p>
+    </aside>
+  </main>
+
+  <!-- Minimal view modal -->
+  <div id="viewModal" class="modal">
+    <div class="modal-backdrop" data-close-modal></div>
+    <div class="modal-dialog">
+      <button class="modal-close" type="button" data-close-modal>×</button>
+      <div class="modal-body">
+        <div class="modal-image-col">
+          <img id="modalMainImg" src="" alt="" class="modal-main-img" />
+          <div id="modalThumbs" class="modal-thumbs"></div>
+        </div>
+        <div class="modal-text-col">
+          <h2 id="modalTitle"></h2>
+          <p id="modalSku" class="modal-sku"></p>
+          <p id="modalDesc" class="modal-desc"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

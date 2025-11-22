@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>CueCube Wholesale – Checkout</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body data-page="checkout">
+  <header class="top-bar">
+    <div class="top-bar-inner">
+      <div class="brand-wrap">
+        <a href="products.html" class="brand-title-link">CUECUBE WHOLESALE</a>
+      </div>
+      <nav class="top-nav">
+        <a href="products.html" class="top-nav-btn">Back to catalog</a>
+        <button id="logoutBtnCheckout" class="top-nav-btn">Logout</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page page-split">
+    <section class="panel">
+      <h1>Checkout</h1>
+      <p>Please review your order and enter shipping details. This form sends an order request; payment is handled offline.</p>
+
+      <div class="summary-box">
+        <h2>Order summary</h2>
+        <div id="summaryItems" class="cart-items"></div>
+        <div class="cart-summary-row">
+          <span>Merchandise total</span>
+          <span id="summaryTotal">$0.00</span>
+        </div>
+        <div class="cart-summary-row">
+          <span>Shipping</span>
+          <span id="shippingCost">$0.00</span>
+        </div>
+        <div class="cart-summary-row cart-summary-total">
+          <span>Total with shipping</span>
+          <span id="grandTotal">$0.00</span>
+        </div>
+      </div>
+
+      <form id="checkoutForm" class="form">
+        <h2>Dealer information</h2>
+        <label>
+          Dealer name
+          <input id="dealerName" type="text" name="dealerName" />
+        </label>
+
+        <label>
+          Email
+          <input id="dealerEmail" type="email" name="dealerEmail" />
+        </label>
+
+        <label>
+          Phone
+          <input id="dealerPhone" type="tel" name="dealerPhone" />
+        </label>
+
+        <h2>Shipping address</h2>
+        <label>
+          Address line 1
+          <input id="dealerAddress1" type="text" name="dealerAddress1" />
+        </label>
+        <label>
+          Address line 2
+          <input id="dealerAddress2" type="text" name="dealerAddress2" />
+        </label>
+        <label>
+          City
+          <input id="dealerCity" type="text" name="dealerCity" />
+        </label>
+        <label>
+          State / Province / Region
+          <input id="dealerState" type="text" name="dealerState" />
+        </label>
+        <label>
+          ZIP / Postal code
+          <input id="dealerZip" type="text" name="dealerZip" />
+        </label>
+        <label>
+          Country
+          <input id="dealerCountry" type="text" name="dealerCountry" value="US" />
+        </label>
+
+        <h2>Shipping options</h2>
+        <p>Click the button to calculate live shipping rates from ShipStation (box 10×10×10 in, 10 lb).</p>
+        <button type="button" id="calcShippingBtn" class="btn-secondary">Calculate shipping</button>
+        <div id="shippingOptions" class="shipping-options"></div>
+        <p id="shippingError" class="form-error" style="display:none;"></p>
+
+        <button type="submit" class="btn-primary btn-full">Submit order request</button>
+        <p class="hint">
+          You will receive a confirmation email with final totals and payment instructions.
+        </p>
+      </form>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

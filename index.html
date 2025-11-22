@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>CueCube Wholesale – Dealer Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body data-page="index">
+  <header class="top-bar">
+    <div class="top-bar-inner">
+      <div class="brand-wrap">
+        <span class="brand-title">CUECUBE WHOLESALE</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="page">
+    <section class="panel">
+      <h1>Dealer login</h1>
+      <p>Authorized dealers only. Use your demo credentials to access wholesale catalog.</p>
+
+      <form id="loginForm" class="form" autocomplete="on">
+        <label>
+          Email
+          <input
+            id="loginEmail"
+            type="email"
+            name="email"
+            autocomplete="email"
+            placeholder=""
+          />
+        </label>
+
+        <label>
+          Password
+          <input
+            id="loginPassword"
+            type="password"
+            name="password"
+            autocomplete="current-password"
+            placeholder=""
+          />
+        </label>
+
+        <p id="loginError" class="form-error" style="display:none;">
+          Invalid login or password. Dealers only.
+        </p>
+
+        <button type="submit" class="btn-primary">Sign in</button>
+
+        <p class="hint">
+          Demo access:<br>
+          <code>demo@cuecube.com</code> / <code>Qwerty142536</code>
+        </p>
+      </form>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
