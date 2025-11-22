@@ -1,12 +1,14 @@
 {
-  "name": "cuecube-wholesale-site",
+  "name": "cuecube-web",
   "version": "1.0.0",
-  "description": "CueCube wholesale dealer site with ShipStation rate lookup proxy",
-  "main": "server.js",
+  "private": true,
+  "description": "CueCube wholesale site with ShipStation live rates",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "dev": "node server.js"
   },
   "dependencies": {
-    "express": "^4.19.2"
+    "express": "^4.19.2",
+    "node-fetch": "^2.7.0"
   }
 }

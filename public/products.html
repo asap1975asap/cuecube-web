@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CUECUBE • Wholesale catalog</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body data-page="products">
+  <header class="site-top">
+    <div class="topbar container">
+      <a class="brand" href="products.html">
+        <img src="img/logo-cuecube.png" alt="CUECUBE" class="brand-logo" />
+      </a>
+      <nav class="top-links">
+        <a href="checkout.html" class="link">Checkout</a>
+        <button id="logoutBtn" class="link danger">Logout</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container two-col">
+    <section>
+      <h1>Wholesale catalog</h1>
+      <div class="grid">
+        <!-- Dime 0.353 -->
+        <article class="product-card" data-product-id="dime353">
+          <div class="product-imgwrap">
+            <img src="img/cue-cube-grey-353-1.jpg" alt="CueCube Dime 0.353" />
+          </div>
+          <h3 class="product-name">CueCube • Dime (.353 in / 8.96 mm)</h3>
+          <p class="product-sku">SKU: CUECUBE-DIME-353</p>
+          <p class="product-desc">Original CueCube shaper/scuffer. Pro-grade, made in USA.</p>
+          <div class="price-row">
+            <span class="price">$15.00</span>
+            <input type="number" class="qty-input" min="10" value="10" />
+          </div>
+          <div class="actions">
+            <button class="add-btn" data-product-id="dime353" data-name="CueCube Dime (.353in)" data-price="15" data-min="10">Add to cart</button>
+            <button class="view-btn" data-product-view="dime353">View</button>
+          </div>
+        </article>
+
+        <!-- Nickel 0.418 -->
+        <article class="product-card" data-product-id="nickel418">
+          <div class="product-imgwrap">
+            <img src="img/cue-cube-grey-418-1.jpg" alt="CueCube Nickel 0.418" />
+          </div>
+          <h3 class="product-name">CueCube • Nickel (.418 in / 10.6 mm)</h3>
+          <p class="product-sku">SKU: CUECUBE-NICKEL-418</p>
+          <p class="product-desc">Original CueCube shaper/scuffer. Pro-grade, made in USA.</p>
+          <div class="price-row">
+            <span class="price">$15.00</span>
+            <input type="number" class="qty-input" min="10" value="10" />
+          </div>
+          <div class="actions">
+            <button class="add-btn" data-product-id="nickel418" data-name="CueCube Nickel (.418in)" data-price="15" data-min="10">Add to cart</button>
+            <button class="view-btn" data-product-view="nickel418">View</button>
+          </div>
+        </article>
+
+        <!-- Keychain 0.418 -->
+        <article class="product-card" data-product-id="keychain">
+          <div class="product-imgwrap">
+            <img src="img/cue-cube-keychain-418-1.jpg" alt="CueCube keychain Nickel" />
+          </div>
+          <h3 class="product-name">CueCube Keychain • Nickel (.418 in)</h3>
+          <p class="product-sku">SKU: CUECUBE-KEYCHAIN-418</p>
+          <p class="product-desc">Portable keychain model. Same performance, pocket-sized.</p>
+          <div class="price-row">
+            <span class="price">$15.00</span>
+            <input type="number" class="qty-input" min="10" value="10" />
+          </div>
+          <div class="actions">
+            <button class="add-btn" data-product-id="keychain" data-name="CueCube Keychain (.418in)" data-price="15" data-min="10">Add to cart</button>
+            <button class="view-btn" data-product-view="keychain">View</button>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <aside class="cart">
+      <h2>Cart</h2>
+      <div id="cartItems"></div>
+      <div class="cart-footer">
+        <div class="line"><span>Total</span><strong id="cartTotal">$0.00</strong></div>
+        <button id="checkoutBtn" class="btn-primary w-100">Go to checkout</button>
+        <p class="tiny">Wholesale terms: min 10 pcs • 50+ → 15% off • 100+ → extra 15%.</p>
+      </div>
+    </aside>
+  </main>
+
+  <!-- View modal -->
+  <div id="viewModal" class="modal">
+    <div class="modal-dialog">
+      <button class="modal-close" data-close-modal>×</button>
+      <div class="modal-body">
+        <div class="modal-media">
+          <img id="modalMainImg" src="" alt="" />
+          <div id="modalThumbs" class="modal-thumbs"></div>
+        </div>
+        <div class="modal-info">
+          <h3 id="modalTitle"></h3>
+          <p id="modalSku" class="muted"></p>
+          <p id="modalDesc"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

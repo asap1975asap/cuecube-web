@@ -1,119 +1,94 @@
+// Minimal Express server with ShipStation rates proxy
 const express = require("express");
 const path = require("path");
+const fetch = require("node-fetch");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ShipStation credentials must be set as environment variables
-const SHIPSTATION_API_KEY = process.env.SHIPSTATION_API_KEY;
-const SHIPSTATION_API_SECRET = process.env.SHIPSTATION_API_SECRET;
-
-if (!SHIPSTATION_API_KEY || !SHIPSTATION_API_SECRET) {
-  console.warn("WARNING: ShipStation API credentials are not set. Shipping rate lookup will fail.");
-}
-
+// Serve static files
+app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
 
-// Serve static files (frontend)
-app.use(express.static(__dirname));
+// Health
+app.get("/healthz", (_, res) => res.json({ ok: true }));
 
-// Simple helper for ShipStation auth header
-function getShipStationAuthHeader() {
-  const token = Buffer.from(`${SHIPSTATION_API_KEY}:${SHIPSTATION_API_SECRET}`).toString("base64");
-  return `Basic ${token}`;
-}
-
-// Proxy endpoint: calculate shipping rates via ShipStation
-app.post("/api/shipping-rates", async (req, res) => {
-  if (!SHIPSTATION_API_KEY || !SHIPSTATION_API_SECRET) {
-    return res.status(500).json({ error: "ShipStation API is not configured on the server." });
-  }
-
-  const { toCity, toState, toPostalCode, toCountry } = req.body || {};
-
-  if (!toPostalCode || !toCountry) {
-    return res.status(400).json({ error: "Destination ZIP/postal code and country are required." });
-  }
-
-  // Default from address: 11435 West Palmetto Park Rd. Unit H, 33428 FL
-  const fromAddress = {
-    postalCode: "33428",
-    city: "Boca Raton",
-    state: "FL",
-    country: "US"
-  };
-
-  // For now every order is 10x10x10 in, 10 lb
-  const payload = {
-    carrierCode: null, // null = let ShipStation return all available services
-    fromPostalCode: fromAddress.postalCode,
-    fromCity: fromAddress.city,
-    fromState: fromAddress.state,
-    fromCountry: fromAddress.country,
-    toPostalCode,
-    toCity: toCity || "",
-    toState: toState || "",
-    toCountry,
-    weight: {
-      value: 10,
-      units: "pounds"
-    },
-    dimensions: {
-      length: 10,
-      width: 10,
-      height: 10,
-      units: "inches"
-    },
-    confirmation: "delivery",
-    residential: true
-  };
-
+// ShipStation live rates proxy
+// Expects: { toAddress: {...}, parcel: { length, width, height, weightLbs } }
+app.post("/api/rates", async (req, res) => {
   try {
-    const resp = await fetch("https://ssapi.shipstation.com/shipments/getrates", {
-      method: "POST",
-      headers: {
-        "Authorization": getShipStationAuthHeader(),
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(payload)
-    });
-
-    const data = await resp.json();
-
-    if (!resp.ok) {
-      console.error("ShipStation error:", data);
-      return res.status(502).json({ error: "ShipStation returned an error", details: data });
+    const { toAddress, parcel } = req.body || {};
+    if (!toAddress || !parcel) {
+      return res.status(400).json({ error: "Missing toAddress or parcel" });
     }
 
-    const rates = (Array.isArray(data) ? data : []).map(rate => {
-      const shipmentCost = Number(rate.shipmentCost || 0);
-      const otherCost = Number(rate.otherCost || 0);
-      const totalCost = shipmentCost + otherCost;
-      return {
-        carrier: rate.carrierFriendlyName || rate.carrierCode,
-        serviceName: rate.serviceName,
-        serviceCode: rate.serviceCode,
-        shipmentCost,
-        otherCost,
-        totalCost,
-        currency: "USD",
-        deliveryDays: rate.deliveryDays,
-        guaranteedService: !!rate.guaranteedService
-      };
-    }).sort((a, b) => a.totalCost - b.totalCost);
+    const from = {
+      name: "CueCube",
+      street1: "11435 West Palmetto Park Rd.",
+      street2: "Unit H",
+      city: "Boca Raton",
+      state: "FL",
+      postalCode: "33428",
+      country: "US"
+    };
 
+    const shipment = {
+      // Not specifying carrierCode allows ShipStation to return all connected carriers (where supported)
+      fromPostalCode: from.postalCode,
+      fromCity: from.city,
+      fromState: from.state,
+      fromCountry: from.country,
+      toPostalCode: String(toAddress.postalCode || ""),
+      toCity: toAddress.city || "",
+      toState: toAddress.state || "",
+      toCountry: toAddress.country || "US",
+      weight: { value: Number(parcel.weightLbs || 10), units: "pounds" },
+      dimensions: {
+        units: "inches",
+        length: Number(parcel.length || 10),
+        width: Number(parcel.width || 10),
+        height: Number(parcel.height || 10),
+      },
+      confirmation: "none",
+      residential: true
+    };
+
+    const apiKey = process.env.SHIPSTATION_API_KEY;
+    const apiSecret = process.env.SHIPSTATION_API_SECRET;
+    if (!apiKey || !apiSecret) {
+      return res.status(500).json({ error: "Server missing ShipStation API credentials" });
+    }
+    const auth = Buffer.from(`${apiKey}:${apiSecret}`).toString("base64");
+
+    // Attempt the official "Rates" endpoint
+    const url = "https://ssapi.shipstation.com/shipments/rates";
+    const resp = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Basic ${auth}`
+      },
+      body: JSON.stringify(shipment)
+    });
+
+    const data = await resp.json().catch(() => ({}));
+    if (!resp.ok) {
+      return res.status(resp.status).json({ error: data?.Message || "ShipStation request failed", detail: data });
+    }
+    // Expecting an array of rates
+    const rates = Array.isArray(data) ? data : (data?.rates || []);
     return res.json({ rates });
   } catch (err) {
-    console.error("Error talking to ShipStation:", err);
-    return res.status(500).json({ error: "Failed to fetch rates from ShipStation." });
+    console.error(err);
+    return res.status(500).json({ error: err.message || "Server error" });
   }
 });
 
-// Fallback: serve index.html
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "index.html"));
+// Fallback to index
+app.get("*", (_, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 app.listen(PORT, () => {
-  console.log(`CueCube wholesale site with ShipStation running on port ${PORT}`);
+  console.log(`Server listening on http://localhost:${PORT}`);
 });

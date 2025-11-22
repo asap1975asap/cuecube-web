@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CUECUBE • Dealer access</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body data-page="index">
+  <header class="site-top">
+    <div class="topbar container">
+      <a class="brand" href="#">
+        <img src="img/logo-cuecube.png" alt="CUECUBE" class="brand-logo" />
+      </a>
+      <span class="pill">WHOLESALE</span>
+      <nav class="crumbs">Billiard accessories • Florida • Dealers only</nav>
+    </div>
+  </header>
+
+  <main class="container hero">
+    <section class="hero-copy">
+      <p class="eyebrow">OFFICIAL BILLIARD ACCESSORY SUPPLIER</p>
+      <h1>Authorized dealers access.</h1>
+      <p class="sub">
+        View wholesale pricing, original CUECUBE and keychain models.
+        Authorized dealers only.
+      </p>
+      <div class="chips">
+        <span class="chip">Min 10 pcs</span>
+        <span class="chip">50+ → 15% off</span>
+        <span class="chip">100+ → extra 15%</span>
+      </div>
+      <div class="thumbs">
+        <img src="img/cue-cube-grey-353-1.jpg" alt="CueCube" />
+        <img src="img/cue-cube-grey-418-1.jpg" alt="CueCube" />
+        <img src="img/cue-cube-keychain-418-1.jpg" alt="CueCube keychain" />
+      </div>
+      <p class="meta">Based in Florida • Ships via UPS / USPS • Billiard retailers &amp; pro shops</p>
+    </section>
+
+    <aside class="login-card" aria-label="Dealer Login">
+      <h2>Dealer Login</h2>
+      <p class="muted">Enter your credentials to open the wholesale catalog.</p>
+      <form id="loginForm" autocomplete="on">
+        <label for="loginEmail">Login / Email</label>
+        <input id="loginEmail" name="email" type="email" placeholder="demo@cuecube.com" autocomplete="username" />
+        <label for="loginPassword">Password</label>
+        <input id="loginPassword" name="password" type="password" placeholder="••••••••" autocomplete="current-password" />
+        <button type="submit" class="btn-primary">Sign in</button>
+        <p id="loginError" class="error" style="display:none;">Invalid email or password.</p>
+        <p class="tiny">Need access? Contact sales to be added as an official dealer.</p>
+      </form>
+    </aside>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
