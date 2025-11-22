@@ -1,11 +1,9 @@
 {
   "name": "cuecube-web",
-  "version": "1.0.0",
   "private": true,
-  "description": "CueCube wholesale site with ShipStation live rates",
+  "version": "1.0.0",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js"
+    "start": "node server.js"
   },
   "dependencies": {
     "express": "^4.19.2",

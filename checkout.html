@@ -1,103 +1,95 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>CueCube Wholesale – Checkout</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Checkout • CueCube</title>
+  <link rel="stylesheet" href="style.css"/>
 </head>
 <body data-page="checkout">
-  <header class="top-bar">
-    <div class="top-bar-inner">
-      <div class="brand-wrap">
-        <a href="products.html" class="brand-title-link">CUECUBE WHOLESALE</a>
+  <header class="header">
+    <div class="container header-wrap">
+      <div class="brand">
+        <a href="products.html"><img src="img/logo-cuecube.png" alt="CueCube"/></a>
+        <span class="badge">WHOLESALE</span>
       </div>
-      <nav class="top-nav">
-        <a href="products.html" class="top-nav-btn">Back to catalog</a>
-        <button id="logoutBtnCheckout" class="top-nav-btn">Logout</button>
-      </nav>
+      <div class="navline" style="margin-left:auto;">
+        <button id="logoutBtnCheckout" class="chip" style="cursor:pointer;">Logout</button>
+      </div>
     </div>
   </header>
 
-  <main class="page page-split">
-    <section class="panel">
-      <h1>Checkout</h1>
-      <p>Please review your order and enter shipping details. This form sends an order request; payment is handled offline.</p>
-
-      <div class="summary-box">
-        <h2>Order summary</h2>
-        <div id="summaryItems" class="cart-items"></div>
-        <div class="cart-summary-row">
-          <span>Merchandise total</span>
-          <span id="summaryTotal">$0.00</span>
+  <main class="container" style="display:grid; grid-template-columns:1fr 380px; gap:20px;">
+    <section class="card">
+      <h2 style="margin:0 0 14px">Shipping address</h2>
+      <form id="checkoutForm">
+        <div class="form-row">
+          <div style="flex:1;">
+            <div class="label">First name</div>
+            <input class="input" name="firstName" required/>
+          </div>
+          <div style="flex:1;">
+            <div class="label">Last name</div>
+            <input class="input" name="lastName" required/>
+          </div>
         </div>
-        <div class="cart-summary-row">
-          <span>Shipping</span>
-          <span id="shippingCost">$0.00</span>
+
+        <div class="label">Company (optional)</div>
+        <input class="input" name="company"/>
+
+        <div class="label">Address line 1</div>
+        <input class="input" name="address1" required/>
+
+        <div class="label">Address line 2</div>
+        <input class="input" name="address2"/>
+
+        <div class="form-row">
+          <div>
+            <div class="label">City</div>
+            <input class="input" name="city" required/>
+          </div>
+          <div>
+            <div class="label">State</div>
+            <input class="input" name="state" required/>
+          </div>
         </div>
-        <div class="cart-summary-row cart-summary-total">
-          <span>Total with shipping</span>
-          <span id="grandTotal">$0.00</span>
+
+        <div class="form-row">
+          <div>
+            <div class="label">Postal code</div>
+            <input class="input" name="postalCode" required/>
+          </div>
+          <div>
+            <div class="label">Country</div>
+            <input class="input" name="country" value="US" required/>
+          </div>
         </div>
-      </div>
 
-      <form id="checkoutForm" class="form">
-        <h2>Dealer information</h2>
-        <label>
-          Dealer name
-          <input id="dealerName" type="text" name="dealerName" />
-        </label>
+        <div class="label">Email</div>
+        <input class="input" name="email" type="email" required/>
 
-        <label>
-          Email
-          <input id="dealerEmail" type="email" name="dealerEmail" />
-        </label>
+        <div class="label">Phone</div>
+        <input class="input" name="phone" required/>
 
-        <label>
-          Phone
-          <input id="dealerPhone" type="tel" name="dealerPhone" />
-        </label>
+        <div class="label" style="margin-top:16px;">Shipping options</div>
+        <div id="ratesBox" class="card" style="padding:12px; background:#0c1815">
+          <div style="color:#9fb7ad">Enter address to load live rates…</div>
+        </div>
 
-        <h2>Shipping address</h2>
-        <label>
-          Address line 1
-          <input id="dealerAddress1" type="text" name="dealerAddress1" />
-        </label>
-        <label>
-          Address line 2
-          <input id="dealerAddress2" type="text" name="dealerAddress2" />
-        </label>
-        <label>
-          City
-          <input id="dealerCity" type="text" name="dealerCity" />
-        </label>
-        <label>
-          State / Province / Region
-          <input id="dealerState" type="text" name="dealerState" />
-        </label>
-        <label>
-          ZIP / Postal code
-          <input id="dealerZip" type="text" name="dealerZip" />
-        </label>
-        <label>
-          Country
-          <input id="dealerCountry" type="text" name="dealerCountry" value="US" />
-        </label>
-
-        <h2>Shipping options</h2>
-        <p>Click the button to calculate live shipping rates from ShipStation (box 10×10×10 in, 10 lb).</p>
-        <button type="button" id="calcShippingBtn" class="btn-secondary">Calculate shipping</button>
-        <div id="shippingOptions" class="shipping-options"></div>
-        <p id="shippingError" class="form-error" style="display:none;"></p>
-
-        <button type="submit" class="btn-primary btn-full">Submit order request</button>
-        <p class="hint">
-          You will receive a confirmation email with final totals and payment instructions.
-        </p>
+        <button class="btn" type="submit">Place order request</button>
       </form>
     </section>
+
+    <aside class="sidebar">
+      <div class="card">
+        <h3 style="margin:4px 0 10px">Order summary</h3>
+        <div id="summaryItems"></div>
+        <div class="total"><span>Total (items)</span><strong id="summaryTotal">$0.00</strong></div>
+      </div>
+    </aside>
   </main>
 
+  <footer class="footer">© 2025 CueCube</footer>
   <script src="script.js"></script>
 </body>
 </html>

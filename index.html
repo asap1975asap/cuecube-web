@@ -1,61 +1,58 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="en" data-theme="dark">
 <head>
-  <meta charset="UTF-8" />
-  <title>CueCube Wholesale – Dealer Login</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>CueCube • Wholesale dealer access</title>
+  <link rel="stylesheet" href="style.css"/>
 </head>
 <body data-page="index">
-  <header class="top-bar">
-    <div class="top-bar-inner">
-      <div class="brand-wrap">
-        <span class="brand-title">CUECUBE WHOLESALE</span>
+  <header class="header">
+    <div class="container header-wrap">
+      <div class="brand">
+        <img src="img/logo-cuecube.png" alt="CueCube logo"/>
+        <span class="badge">WHOLESALE</span>
       </div>
+      <div class="navline" style="margin-left:auto;">Billiard accessories • Florida • Dealers only</div>
     </div>
   </header>
 
-  <main class="page">
-    <section class="panel">
-      <h1>Dealer login</h1>
-      <p>Authorized dealers only. Use your demo credentials to access wholesale catalog.</p>
+  <main class="container">
+    <section class="kv">
+      <div>
+        <div style="font-size:12px; letter-spacing:.18em; color:#9bb9ad">OFFICIAL BILLIARD ACCESSORY SUPPLIER</div>
+        <h1>Authorized dealers access.</h1>
+        <p class="lead">View wholesale pricing, original CUECUBE and keychain models. Authorized dealers only.</p>
 
-      <form id="loginForm" class="form" autocomplete="on">
-        <label>
-          Email
-          <input
-            id="loginEmail"
-            type="email"
-            name="email"
-            autocomplete="email"
-            placeholder=""
-          />
-        </label>
+        <div class="chips">
+          <div class="chip">Min 10 pcs</div>
+          <div class="chip">50+ → 15% off</div>
+          <div class="chip">100+ → extra 15%</div>
+        </div>
 
-        <label>
-          Password
-          <input
-            id="loginPassword"
-            type="password"
-            name="password"
-            autocomplete="current-password"
-            placeholder=""
-          />
-        </label>
+        <div class="row-imgs">
+          <img src="img/cue-cube-grey-353-1.jpg" alt="CueCube"/>
+          <img src="img/cue-cube-grey-418-1.jpg" alt="CueCube"/>
+          <img src="img/cue-cube-keychain-418-1.jpg" alt="CueCube keychain"/>
+        </div>
+      </div>
 
-        <p id="loginError" class="form-error" style="display:none;">
-          Invalid login or password. Dealers only.
-        </p>
+      <aside class="login-card card">
+        <h2 style="margin:0 0 10px">Dealer Login</h2>
+        <p class="lead" style="margin:0 0 14px">Enter your credentials to open the wholesale catalog.</p>
 
-        <button type="submit" class="btn-primary">Sign in</button>
-
-        <p class="hint">
-          Demo access:<br>
-          <code>demo@cuecube.com</code> / <code>Qwerty142536</code>
-        </p>
-      </form>
+        <form id="loginForm" autocomplete="off">
+          <input id="loginEmail" class="input" type="email" inputmode="email" placeholder="Login / Email" autocomplete="off"/>
+          <input id="loginPassword" class="input" type="password" placeholder="Password" autocomplete="new-password"/>
+          <button class="btn" type="submit">Sign in</button>
+          <div id="loginError" class="error">Incorrect login or password for demo access.</div>
+          <p class="helper">Need access? Contact sales to be added as an official dealer.</p>
+        </form>
+      </aside>
     </section>
   </main>
+
+  <footer class="footer">© 2025 CueCube. Based in Florida • Ships via UPS / USPS • Billiard retailers &amp; pro shops</footer>
 
   <script src="script.js"></script>
 </body>
