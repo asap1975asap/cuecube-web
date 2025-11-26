@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <title>CueCube Wholesale Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body data-page="index">
+  <header class="topbar">
+    <img src="img/logo-cuecube.png" class="logo" alt="CueCube" />
+    <span class="pill">WHOLESALE DEALER ACCESS</span>
+  </header>
+
+  <main class="login-grid">
+    <section class="hero">
+      <h1>CueCube wholesale access.</h1>
+      <p>Official CueCube cue-tip tools. View dealer pricing, order by box and ship from Florida.</p>
+      <p class="note">Authorized billiard retailers &amp; pro shops only.</p>
+    </section>
+
+    <section class="panel">
+      <h2>Dealer login</h2>
+      <form id="loginForm" autocomplete="on">
+        <label>Email</label>
+        <input id="loginEmail" type="email" autocomplete="username" placeholder="you@shop.com" />
+
+        <label>Password</label>
+        <input id="loginPassword" type="password" autocomplete="current-password" placeholder="Enter password" />
+
+        <div id="loginError" class="error" style="display:none;">Invalid email or password.</div>
+
+        <button type="submit" class="btn-gold">Sign in</button>
+      </form>
+    </section>
+  </main>
+
+  <script>
+    window.API_BASE = "https://cuecube-backend.onrender.com"; /* <-- ПОМЕНЯЙ на свой backend */
+  </script>
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <title>CueCube Checkout</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body data-page="checkout">
+  <header class="topbar">
+    <img src="img/logo-cuecube.png" class="logo" alt="CueCube" />
+    <span class="pill">CHECKOUT</span>
+    <button id="logoutBtnCheckout" class="btn-outline">Logout</button>
+  </header>
+
+  <main class="checkout-layout">
+    <section class="panel">
+      <h2>Shipping address</h2>
+      <form id="checkoutForm">
+        <input id="shipName" placeholder="Full name" required />
+        <input id="shipPhone" placeholder="Phone" inputmode="tel" />
+        <input id="shipAddr1" placeholder="Street address" required />
+        <input id="shipAddr2" placeholder="Apartment / Suite (optional)" />
+        <div class="row">
+          <input id="shipCity" placeholder="City" required />
+          <input id="shipState" placeholder="State (e.g. FL)" maxlength="2" required />
+          <input id="shipPostal" placeholder="ZIP" required />
+        </div>
+        <input id="shipCountry" placeholder="Country" value="US" />
+
+        <div id="shippingOptions" class="rates-box">
+          Enter full address to see shipping options.
+        </div>
+
+        <button type="submit" class="btn-gold">Submit order request</button>
+      </form>
+    </section>
+
+    <aside class="panel">
+      <h2>Order summary</h2>
+      <div id="summaryItems"></div>
+      <div class="cart-total">
+        <span>Merch total</span>
+        <strong id="summaryTotal">$0.00</strong>
+      </div>
+    </aside>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <title>CueCube Wholesale Catalog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body data-page="products">
+  <header class="topbar">
+    <img src="img/logo-cuecube.png" class="logo" alt="CueCube" />
+    <span class="pill">WHOLESALE CATALOG</span>
+    <button id="logoutBtn" class="btn-outline">Logout</button>
+  </header>
+
+  <main class="catalog-layout">
+    <section class="catalog-main">
+      <h1>Dealer catalog</h1>
+      <p class="note">Min order 10 pcs per SKU. 50+ → 15% off, 100+ → extra 15%.</p>
+
+      <div class="cards">
+        <article class="product-card" data-product-id="dime353">
+          <img src="img/cue-cube-grey-353-1.jpg" alt="CueCube Dime .353" />
+          <div class="card-body">
+            <div class="sku">SKU: CC-DIME-353</div>
+            <div class="name">CueCube — Dime (.353")</div>
+            <p>Original CueCube shaper/scuffer. Dime radius 8.96mm.</p>
+            <div class="row">
+              <input class="qty-input" type="number" min="10" step="10" value="10" />
+              <button class="btn-small add-btn"
+                data-product-id="dime353"
+                data-name="CueCube — Dime (.353)"
+                data-price="12">Add to cart</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="product-card" data-product-id="nickel418">
+          <img src="img/cue-cube-grey-418-1.jpg" alt="CueCube Nickel .418" />
+          <div class="card-body">
+            <div class="sku">SKU: CC-NICKEL-418</div>
+            <div class="name">CueCube — Nickel (.418")</div>
+            <p>Original CueCube shaper/scuffer. Nickel radius 10.6mm.</p>
+            <div class="row">
+              <input class="qty-input" type="number" min="10" step="10" value="10" />
+              <button class="btn-small add-btn"
+                data-product-id="nickel418"
+                data-name="CueCube — Nickel (.418)"
+                data-price="15">Add to cart</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="product-card" data-product-id="keychain">
+          <img src="img/cue-cube-keychain-418-1.jpg" alt="CueCube Keychain" />
+          <div class="card-body">
+            <div class="sku">SKU: CC-KEYCHAIN-418</div>
+            <div class="name">CueCube Keychain</div>
+            <p>Keychain cue-tip tool, Nickel radius.</p>
+            <div class="row">
+              <input class="qty-input" type="number" min="10" step="10" value="10" />
+              <button class="btn-small add-btn"
+                data-product-id="keychain"
+                data-name="CueCube Keychain"
+                data-price="14">Add to cart</button>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <aside class="cart-panel">
+      <h2>Cart</h2>
+      <div id="cartItems"></div>
+      <div class="cart-total">
+        <span>Total</span>
+        <strong id="cartTotal">$0.00</strong>
+      </div>
+      <button id="checkoutBtn" class="btn-gold">Go to checkout</button>
+    </aside>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
