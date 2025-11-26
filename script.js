@@ -1,187 +1,260 @@
-
-// ===== Auth (simple demo) =====
+// ===== CONFIG =====
 const DEMO_EMAIL = "demo@cuecube.com";
-const DEMO_PASSWORD = "Qwerty142536"; // per user request
+const DEMO_PASSWORD = "Qwerty142536"; // твой демо-пароль
 const AUTH_KEY = "cuecubeLoggedIn";
-const SEEN_KEY = "cuecubeSeenLogin";
+const CART_KEY = "cuecubeCart";
 
-function setLoggedIn(flag){ flag ? localStorage.setItem(AUTH_KEY,"true") : localStorage.removeItem(AUTH_KEY); }
-function isLoggedIn(){ return localStorage.getItem(AUTH_KEY) === "true"; }
+// адрес бэкенда (можно переопределить через window.API_BASE в index.html)
+const API_BASE = (window.API_BASE || "").replace(/\/+$/, "");
 
-document.addEventListener("DOMContentLoaded",()=>{
+// ===== HELPERS =====
+function money(n) {
+  return "$" + Number(n || 0).toFixed(2);
+}
+function loadCart() {
+  try {
+    return JSON.parse(localStorage.getItem(CART_KEY)) || [];
+  } catch {
+    return [];
+  }
+}
+function saveCart(items) {
+  localStorage.setItem(CART_KEY, JSON.stringify(items));
+}
+function setLoggedIn(flag) {
+  if (flag) localStorage.setItem(AUTH_KEY, "true");
+  else localStorage.removeItem(AUTH_KEY);
+}
+function isLoggedIn() {
+  return localStorage.getItem(AUTH_KEY) === "true";
+}
+
+// ===== INIT =====
+document.addEventListener("DOMContentLoaded", () => {
   const page = document.body.dataset.page;
 
-  // Clear autofill on true first-visit for new browsers
-  if(page === "index"){
-    const email = document.getElementById("loginEmail");
-    const pass = document.getElementById("loginPassword");
-    if(!localStorage.getItem(SEEN_KEY)){
-      if(email) email.value = "";
-      if(pass) pass.value = "";
-      localStorage.setItem(SEEN_KEY,"1");
-    }
-    const form = document.getElementById("loginForm");
-    const errorEl = document.getElementById("loginError");
-    form.addEventListener("submit",(e)=>{
-      e.preventDefault();
-      const ok = email.value.trim() === DEMO_EMAIL && pass.value === DEMO_PASSWORD;
-      if(ok){ setLoggedIn(true); location.href = "products.html"; } else { errorEl.style.display = "block"; }
-    });
+  if ((page === "products" || page === "checkout") && !isLoggedIn()) {
+    location.href = "index.html";
     return;
   }
 
-  // Redirect protection
-  if ((page === "products" || page === "checkout") && !isLoggedIn()) {
-    location.href = "index.html"; return;
-  }
-
-  // Logout buttons
-  [document.getElementById("logoutBtn"), document.getElementById("logoutBtnCheckout")].forEach(btn=>{
-    if(btn) btn.addEventListener("click",()=>{ setLoggedIn(false); location.href="index.html"; });
-  });
-
-  // Cart / checkout
-  if(page === "products" || page === "checkout"){ initCartAndCheckout(page); }
+  if (page === "index") initLogin();
+  if (page === "products") initProducts();
+  if (page === "checkout") initCheckout();
 });
 
-// ===== Cart + checkout =====
-const CART_KEY = "cuecubeCart";
-function loadCart(){ try { return JSON.parse(localStorage.getItem(CART_KEY)) || []; } catch{ return []; } }
-function saveCart(items){ localStorage.setItem(CART_KEY, JSON.stringify(items)); }
-function formatMoney(n){ return "$" + n.toFixed(2); }
+// ===== LOGIN =====
+function initLogin() {
+  const form = document.getElementById("loginForm");
+  const email = document.getElementById("loginEmail");
+  const pass = document.getElementById("loginPassword");
+  const errorEl = document.getElementById("loginError");
 
-function initCartAndCheckout(page){
-  const cart = loadCart();
-  if(page === "products"){ setupProductsPage(cart); }
-  if(page === "checkout"){ setupCheckoutPage(cart); }
+  // при первом заходе очищаем поля (но браузер может предложить автозаполнение)
+  email.value = "";
+  pass.value = "";
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    if (email.value.trim() === DEMO_EMAIL && pass.value === DEMO_PASSWORD) {
+      setLoggedIn(true);
+      location.href = "products.html";
+    } else {
+      errorEl.style.display = "block";
+    }
+  });
 }
 
-function setupProductsPage(cart){
+// ===== PRODUCTS + CART =====
+function initProducts() {
+  const logoutBtn = document.getElementById("logoutBtn");
+  logoutBtn?.addEventListener("click", () => {
+    setLoggedIn(false);
+    location.href = "index.html";
+  });
+
+  const cart = loadCart();
   const cartItemsEl = document.getElementById("cartItems");
   const cartTotalEl = document.getElementById("cartTotal");
-  const addButtons = document.querySelectorAll(".add-btn");
+  const addBtns = document.querySelectorAll(".add-btn");
   const checkoutBtn = document.getElementById("checkoutBtn");
 
-  function renderCart(){
+  function renderCart() {
     cartItemsEl.innerHTML = "";
     let total = 0;
-    if(cart.length===0){
-      cartItemsEl.innerHTML = '<p class="cart-empty">No items yet. Add quantities from the catalog.</p>';
-    }else{
-      cart.forEach(it=>{
-        const line = it.qty * it.price; total += line;
-        const div = document.createElement("div");
-        div.className = "cart-item";
-        div.innerHTML = '<div><div class="product-name">'+it.name+'</div><div class="product-sku">'+(it.sku||"")+' • '+it.qty+' × '+formatMoney(it.price)+'</div></div><div>'+formatMoney(line)+'</div>';
-        cartItemsEl.appendChild(div);
-      });
+    if (!cart.length) {
+      cartItemsEl.textContent = "Cart is empty. Add items from the catalog.";
+      cartTotalEl.textContent = "$0.00";
+      return;
     }
-    cartTotalEl.textContent = formatMoney(total);
+
+    cart.forEach((item) => {
+      const line = item.qty * item.price;
+      total += line;
+      const row = document.createElement("div");
+      row.className = "cart-line";
+      row.innerHTML = `
+        <div>
+          <div>${item.name}</div>
+          <div class="sku">${item.sku || ""}</div>
+        </div>
+        <div>${money(line)}</div>
+      `;
+      cartItemsEl.appendChild(row);
+    });
+    cartTotalEl.textContent = money(total);
   }
 
-  function add(btn){
+  function addToCart(btn) {
     const card = btn.closest(".product-card");
-    const qty = Math.max(parseInt(card.querySelector(".qty-input").value||0,10), 10);
     const id = btn.dataset.productId;
     const name = btn.dataset.name;
     const price = Number(btn.dataset.price);
+    const qtyInput = card.querySelector(".qty-input");
+    let qty = Number(qtyInput.value || 0);
+    if (isNaN(qty) || qty < 10) qty = 10;
 
-    const existing = cart.find(x=>x.id===id);
-    if(existing){ existing.qty += qty; } else {
-      cart.push({id,name,price,qty, sku: card.querySelector(".product-sku")?.textContent.replace("SKU: ","") || ""});
-    }
-    saveCart(cart); renderCart();
+    const skuText = card.querySelector(".sku")?.textContent.replace("SKU: ", "") || "";
+
+    const existing = cart.find((i) => i.id === id);
+    if (existing) existing.qty += qty;
+    else cart.push({ id, name, price, qty, sku: skuText });
+
+    saveCart(cart);
+    renderCart();
   }
 
-  addButtons.forEach(b=>b.addEventListener("click",()=>add(b)));
-  checkoutBtn.addEventListener("click",()=> location.href="checkout.html");
+  addBtns.forEach((btn) => {
+    btn.addEventListener("click", () => addToCart(btn));
+  });
+
+  checkoutBtn.addEventListener("click", () => {
+    if (!cart.length) {
+      alert("Cart is empty.");
+      return;
+    }
+    location.href = "checkout.html";
+  });
+
   renderCart();
 }
 
-async function setupCheckoutPage(cart){
-  const itemsEl = document.getElementById("summaryItems");
-  const totalEl = document.getElementById("summaryTotal");
-  const form = document.getElementById("checkoutForm");
-  const ratesBox = document.getElementById("ratesBox");
-
-  let total = 0; itemsEl.innerHTML = "";
-  if(cart.length===0){
-    itemsEl.innerHTML = '<p class="cart-empty">Your cart is empty.</p>';
-  }else{
-    cart.forEach(it=>{
-      const line = it.qty * it.price; total += line;
-      const div = document.createElement("div");
-      div.className = "summary-item";
-      div.innerHTML = '<span>'+it.name+' ('+it.qty+' × '+formatMoney(it.price)+')</span><span>'+formatMoney(line)+'</span>';
-      itemsEl.appendChild(div);
-    });
+// ===== CHECKOUT + RATES =====
+async function fetchRatesForAddress(to) {
+  if (!API_BASE) {
+    throw new Error("API_BASE is not set");
   }
-  totalEl.textContent = formatMoney(total);
+  const resp = await fetch(API_BASE + "/api/rates", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ to })
+  });
+  if (!resp.ok) {
+    const text = await resp.text();
+    throw new Error("Rate error: " + text);
+  }
+  return resp.json();
+}
 
-  // Load rates once the user leaves the postal/city/state fields
-  const addressFields = ["address1","address2","city","state","postalCode","country"];
-  addressFields.forEach(n=>{
-    const el = form.querySelector('[name="'+n+'"]');
-    el.addEventListener("change", ()=>rateIt());
-    el.addEventListener("blur", ()=>rateIt());
+function initCheckout() {
+  const logoutBtn = document.getElementById("logoutBtnCheckout");
+  logoutBtn?.addEventListener("click", () => {
+    setLoggedIn(false);
+    location.href = "index.html";
   });
 
-  let selectedRate = null;
+  // вывод корзины
+  const cart = loadCart();
+  const itemsEl = document.getElementById("summaryItems");
+  const totalEl = document.getElementById("summaryTotal");
+  let total = 0;
 
-  async function rateIt(){
-    const payload = {
-      to: {
-        name: (form.firstName.value+' '+form.lastName.value).trim() || "Dealer",
-        company: form.company.value || undefined,
-        address1: form.address1.value,
-        address2: form.address2.value || undefined,
-        city: form.city.value,
-        state: form.state.value,
-        postalCode: form.postalCode.value,
-        country: form.country.value || "US",
-        phone: form.phone.value || "0000000000",
-        email: form.email.value || "dealer@example.com"
-      },
-      // Defaults per user request
-      package: {
-        weightLb: 10,
-        dimIn: { length: 10, width: 10, height: 10 }
-      },
-      cartValue: total
+  if (!cart.length) {
+    itemsEl.textContent = "Cart is empty. Go back to catalog.";
+  } else {
+    itemsEl.innerHTML = "";
+    cart.forEach((item) => {
+      const line = item.qty * item.price;
+      total += line;
+      const row = document.createElement("div");
+      row.className = "cart-line";
+      row.innerHTML = `
+        <span>${item.name} (${item.qty} × ${money(item.price)})</span>
+        <span>${money(line)}</span>
+      `;
+      itemsEl.appendChild(row);
+    });
+  }
+  totalEl.textContent = money(total);
+
+  const form = document.getElementById("checkoutForm");
+  const box = document.getElementById("shippingOptions");
+
+  function getToAddress() {
+    return {
+      name: document.getElementById("shipName").value.trim(),
+      phone: document.getElementById("shipPhone").value.trim(),
+      street1: document.getElementById("shipAddr1").value.trim(),
+      street2: document.getElementById("shipAddr2").value.trim(),
+      city: document.getElementById("shipCity").value.trim(),
+      state: document.getElementById("shipState").value.trim(),
+      postalCode: document.getElementById("shipPostal").value.trim(),
+      country: (document.getElementById("shipCountry").value || "US").trim()
     };
-    if(!payload.to.address1 || !payload.to.city || !payload.to.state || !payload.to.postalCode) return;
-
-    ratesBox.innerHTML = '<div style="color:#9fb7ad">Loading live rates…</div>';
-    try{
-      const res = await fetch("/api/rates", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(payload)});
-      if(!res.ok) throw new Error("Bad response");
-      const data = await res.json();
-      if(!Array.isArray(data) || data.length===0){ throw new Error("No rates"); }
-      ratesBox.innerHTML = "";
-      data.forEach((r,idx)=>{
-        const el = document.createElement("div");
-        el.className = "ship-rate";
-        el.dataset.index = idx;
-        el.innerHTML = '<div><strong>'+r.carrier+' • '+r.service+'</strong><div style="color:#9fb7ad;font-size:13px">'+(r.eta || "No ETA")+'</div></div><div><strong>'+formatMoney(r.amount)+'</strong></div>';
-        el.addEventListener("click",()=>{
-          selectedRate = r;
-          ratesBox.querySelectorAll(".ship-rate").forEach(x=>x.classList.remove("active"));
-          el.classList.add("active");
-        });
-        ratesBox.appendChild(el);
-      });
-      // preselect cheapest
-      const list = ratesBox.querySelectorAll(".ship-rate");
-      if(list.length){ list[0].click(); }
-    }catch(e){
-      ratesBox.innerHTML = '<div style="color:#ffb4b4">Could not load rates. We will confirm shipping manually.</div>';
-      selectedRate = null;
-    }
   }
 
-  form.addEventListener("submit",(e)=>{
+  let rateTimer = null;
+  function scheduleRates() {
+    clearTimeout(rateTimer);
+    rateTimer = setTimeout(async () => {
+      const to = getToAddress();
+      if (!to.street1 || !to.city || !to.state || !to.postalCode || !to.country) {
+        box.textContent = "Enter full address to see shipping options.";
+        return;
+      }
+      box.textContent = "Loading shipping options...";
+      try {
+        const data = await fetchRatesForAddress({
+          city: to.city,
+          state: to.state,
+          postalCode: to.postalCode,
+          country: to.country
+        });
+        const rates = data.rates || [];
+        if (!rates.length) {
+          box.textContent = "No rates returned. We will confirm shipping manually.";
+          return;
+        }
+        box.innerHTML = rates
+          .map((r, i) => {
+            const id = "rate-" + i;
+            return `
+              <label class="rate-line">
+                <input type="radio" name="shipRate" id="${id}" value="${r.carrierCode}|${r.serviceCode}" ${i === 0 ? "checked" : ""}>
+                <strong>${r.carrierCode || ""} ${r.serviceName || ""}</strong>
+                <span style="float:right;">${money(r.total)}</span>
+              </label>
+            `;
+          })
+          .join("");
+      } catch (e) {
+        console.error(e);
+        box.textContent = "Could not load rates. We will confirm shipping manually.";
+      }
+    }, 500);
+  }
+
+  ["shipAddr1", "shipCity", "shipState", "shipPostal", "shipCountry"].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener("blur", scheduleRates);
+      el.addEventListener("change", scheduleRates);
+    }
+  });
+
+  form.addEventListener("submit", (e) => {
     e.preventDefault();
-    alert("Order request submitted. Shipping: "+(selectedRate ? (selectedRate.carrier+' '+selectedRate.service+' '+formatMoney(selectedRate.amount)) : "TBD by sales")+". We will contact you to confirm pricing and shipping.");
+    alert("Order request submitted. We will contact you to confirm pricing and shipping.");
     localStorage.removeItem(CART_KEY);
     location.href = "products.html";
   });
