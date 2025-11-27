@@ -1,16 +1,75 @@
-// ===== CONFIG =====
+﻿// ===== Simple "auth" =====
+
 const DEMO_EMAIL = "demo@cuecube.com";
-const DEMO_PASSWORD = "Qwerty142536"; // твой демо-пароль
+const DEMO_PASSWORD = "123Qwerty123";
 const AUTH_KEY = "cuecubeLoggedIn";
+
+function setLoggedIn(flag) {
+  if (flag) {
+    localStorage.setItem(AUTH_KEY, "true");
+  } else {
+    localStorage.removeItem(AUTH_KEY);
+  }
+}
+
+function isLoggedIn() {
+  return localStorage.getItem(AUTH_KEY) === "true";
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const page = document.body.dataset.page;
+
+  // Redirect protection
+  if ((page === "products" || page === "checkout") && !isLoggedIn()) {
+    window.location.href = "index.html";
+    return;
+  }
+
+  // Index (login)
+  if (page === "index") {
+    const form = document.getElementById("loginForm");
+    const emailInput = document.getElementById("loginEmail");
+    const passInput = document.getElementById("loginPassword");
+    const errorEl = document.getElementById("loginError");
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      const email = emailInput.value.trim();
+      const pass = passInput.value;
+
+      if (email === DEMO_EMAIL && pass === DEMO_PASSWORD) {
+        setLoggedIn(true);
+        window.location.href = "products.html";
+      } else {
+        errorEl.style.display = "block";
+      }
+    });
+
+    return;
+  }
+
+  // Logout (shared)
+  const logoutBtn = document.getElementById("logoutBtn");
+  const logoutBtnCheckout = document.getElementById("logoutBtnCheckout");
+  [logoutBtn, logoutBtnCheckout].forEach((btn) => {
+    if (!btn) return;
+    btn.addEventListener("click", () => {
+      setLoggedIn(false);
+      window.location.href = "index.html";
+    });
+  });
+
+  // Products & cart
+  if (page === "products" || page === "checkout") {
+    initCartAndCheckout(page);
+  }
+});
+
+// ===== Cart + checkout =====
+
 const CART_KEY = "cuecubeCart";
 
-// адрес бэкенда (можно переопределить через window.API_BASE в index.html)
-const API_BASE = (window.API_BASE || "").replace(/\/+$/, "");
-
-// ===== HELPERS =====
-function money(n) {
-  return "$" + Number(n || 0).toFixed(2);
-}
 function loadCart() {
   try {
     return JSON.parse(localStorage.getItem(CART_KEY)) || [];
@@ -18,244 +77,231 @@ function loadCart() {
     return [];
   }
 }
+
 function saveCart(items) {
   localStorage.setItem(CART_KEY, JSON.stringify(items));
 }
-function setLoggedIn(flag) {
-  if (flag) localStorage.setItem(AUTH_KEY, "true");
-  else localStorage.removeItem(AUTH_KEY);
-}
-function isLoggedIn() {
-  return localStorage.getItem(AUTH_KEY) === "true";
+
+function formatMoney(num) {
+  return "$" + num.toFixed(2);
 }
 
-// ===== INIT =====
-document.addEventListener("DOMContentLoaded", () => {
-  const page = document.body.dataset.page;
-
-  if ((page === "products" || page === "checkout") && !isLoggedIn()) {
-    location.href = "index.html";
-    return;
-  }
-
-  if (page === "index") initLogin();
-  if (page === "products") initProducts();
-  if (page === "checkout") initCheckout();
-});
-
-// ===== LOGIN =====
-function initLogin() {
-  const form = document.getElementById("loginForm");
-  const email = document.getElementById("loginEmail");
-  const pass = document.getElementById("loginPassword");
-  const errorEl = document.getElementById("loginError");
-
-  // при первом заходе очищаем поля (но браузер может предложить автозаполнение)
-  email.value = "";
-  pass.value = "";
-
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
-    if (email.value.trim() === DEMO_EMAIL && pass.value === DEMO_PASSWORD) {
-      setLoggedIn(true);
-      location.href = "products.html";
-    } else {
-      errorEl.style.display = "block";
-    }
-  });
-}
-
-// ===== PRODUCTS + CART =====
-function initProducts() {
-  const logoutBtn = document.getElementById("logoutBtn");
-  logoutBtn?.addEventListener("click", () => {
-    setLoggedIn(false);
-    location.href = "index.html";
-  });
-
+function initCartAndCheckout(page) {
   const cart = loadCart();
+
+  if (page === "products") {
+    setupProductsPage(cart);
+  } else if (page === "checkout") {
+    setupCheckoutPage(cart);
+  }
+}
+
+function setupProductsPage(cart) {
   const cartItemsEl = document.getElementById("cartItems");
   const cartTotalEl = document.getElementById("cartTotal");
-  const addBtns = document.querySelectorAll(".add-btn");
+  const addButtons = document.querySelectorAll(".add-btn");
   const checkoutBtn = document.getElementById("checkoutBtn");
+
+  // View modal
+  setupViewModal();
 
   function renderCart() {
     cartItemsEl.innerHTML = "";
     let total = 0;
-    if (!cart.length) {
-      cartItemsEl.textContent = "Cart is empty. Add items from the catalog.";
-      cartTotalEl.textContent = "$0.00";
-      return;
+
+    if (cart.length === 0) {
+      cartItemsEl.innerHTML =
+        '<p class="cart-empty">No items yet. Add quantities from the catalog.</p>';
+    } else {
+      cart.forEach((item) => {
+        const line = item.qty * item.price;
+        total += line;
+
+        const div = document.createElement("div");
+        div.className = "cart-item";
+
+        div.innerHTML = `
+          <div class="cart-item-main">
+            <span class="cart-item-name">${item.name}</span>
+            <span class="cart-item-meta">${item.sku || ""} • ${item.qty} × ${formatMoney(item.price)}</span>
+          </div>
+          <div class="cart-item-total">
+            ${formatMoney(line)}
+          </div>
+        `;
+
+        cartItemsEl.appendChild(div);
+      });
     }
 
-    cart.forEach((item) => {
-      const line = item.qty * item.price;
-      total += line;
-      const row = document.createElement("div");
-      row.className = "cart-line";
-      row.innerHTML = `
-        <div>
-          <div>${item.name}</div>
-          <div class="sku">${item.sku || ""}</div>
-        </div>
-        <div>${money(line)}</div>
-      `;
-      cartItemsEl.appendChild(row);
-    });
-    cartTotalEl.textContent = money(total);
+    cartTotalEl.textContent = formatMoney(total);
   }
 
-  function addToCart(btn) {
-    const card = btn.closest(".product-card");
+  function addToCartFromButton(btn) {
     const id = btn.dataset.productId;
     const name = btn.dataset.name;
     const price = Number(btn.dataset.price);
+    const min = Number(btn.dataset.min) || 1;
+
+    const card = btn.closest(".product-card");
     const qtyInput = card.querySelector(".qty-input");
     let qty = Number(qtyInput.value || 0);
-    if (isNaN(qty) || qty < 10) qty = 10;
 
-    const skuText = card.querySelector(".sku")?.textContent.replace("SKU: ", "") || "";
+    if (isNaN(qty) || qty < min) {
+      qty = min;
+      qtyInput.value = min;
+    }
 
-    const existing = cart.find((i) => i.id === id);
-    if (existing) existing.qty += qty;
-    else cart.push({ id, name, price, qty, sku: skuText });
+    const existing = cart.find((item) => item.id === id);
+    if (existing) {
+      existing.qty += qty;
+    } else {
+      cart.push({
+        id,
+        name,
+        price,
+        qty,
+        sku: card.querySelector(".product-sku")?.textContent.replace("SKU: ", "") || "",
+      });
+    }
 
     saveCart(cart);
     renderCart();
   }
 
-  addBtns.forEach((btn) => {
-    btn.addEventListener("click", () => addToCart(btn));
+  addButtons.forEach((btn) => {
+    btn.addEventListener("click", () => addToCartFromButton(btn));
   });
 
   checkoutBtn.addEventListener("click", () => {
-    if (!cart.length) {
-      alert("Cart is empty.");
-      return;
-    }
-    location.href = "checkout.html";
+    window.location.href = "checkout.html";
   });
 
   renderCart();
 }
 
-// ===== CHECKOUT + RATES =====
-async function fetchRatesForAddress(to) {
-  if (!API_BASE) {
-    throw new Error("API_BASE is not set");
-  }
-  const resp = await fetch(API_BASE + "/api/rates", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ to })
-  });
-  if (!resp.ok) {
-    const text = await resp.text();
-    throw new Error("Rate error: " + text);
-  }
-  return resp.json();
-}
-
-function initCheckout() {
-  const logoutBtn = document.getElementById("logoutBtnCheckout");
-  logoutBtn?.addEventListener("click", () => {
-    setLoggedIn(false);
-    location.href = "index.html";
-  });
-
-  // вывод корзины
-  const cart = loadCart();
+function setupCheckoutPage(cart) {
   const itemsEl = document.getElementById("summaryItems");
   const totalEl = document.getElementById("summaryTotal");
-  let total = 0;
+  const form = document.getElementById("checkoutForm");
 
-  if (!cart.length) {
-    itemsEl.textContent = "Cart is empty. Go back to catalog.";
+  let total = 0;
+  itemsEl.innerHTML = "";
+
+  if (cart.length === 0) {
+    itemsEl.innerHTML =
+      '<p class="cart-empty">Your cart is empty. Go back to the catalog to add items.</p>';
   } else {
-    itemsEl.innerHTML = "";
     cart.forEach((item) => {
       const line = item.qty * item.price;
       total += line;
-      const row = document.createElement("div");
-      row.className = "cart-line";
-      row.innerHTML = `
-        <span>${item.name} (${item.qty} × ${money(item.price)})</span>
-        <span>${money(line)}</span>
+
+      const div = document.createElement("div");
+      div.className = "summary-item";
+      div.innerHTML = `
+        <span>${item.name} (${item.qty} × ${formatMoney(item.price)})</span>
+        <span>${formatMoney(line)}</span>
       `;
-      itemsEl.appendChild(row);
+      itemsEl.appendChild(div);
     });
   }
-  totalEl.textContent = money(total);
 
-  const form = document.getElementById("checkoutForm");
-  const box = document.getElementById("shippingOptions");
-
-  function getToAddress() {
-    return {
-      name: document.getElementById("shipName").value.trim(),
-      phone: document.getElementById("shipPhone").value.trim(),
-      street1: document.getElementById("shipAddr1").value.trim(),
-      street2: document.getElementById("shipAddr2").value.trim(),
-      city: document.getElementById("shipCity").value.trim(),
-      state: document.getElementById("shipState").value.trim(),
-      postalCode: document.getElementById("shipPostal").value.trim(),
-      country: (document.getElementById("shipCountry").value || "US").trim()
-    };
-  }
-
-  let rateTimer = null;
-  function scheduleRates() {
-    clearTimeout(rateTimer);
-    rateTimer = setTimeout(async () => {
-      const to = getToAddress();
-      if (!to.street1 || !to.city || !to.state || !to.postalCode || !to.country) {
-        box.textContent = "Enter full address to see shipping options.";
-        return;
-      }
-      box.textContent = "Loading shipping options...";
-      try {
-        const data = await fetchRatesForAddress({
-          city: to.city,
-          state: to.state,
-          postalCode: to.postalCode,
-          country: to.country
-        });
-        const rates = data.rates || [];
-        if (!rates.length) {
-          box.textContent = "No rates returned. We will confirm shipping manually.";
-          return;
-        }
-        box.innerHTML = rates
-          .map((r, i) => {
-            const id = "rate-" + i;
-            return `
-              <label class="rate-line">
-                <input type="radio" name="shipRate" id="${id}" value="${r.carrierCode}|${r.serviceCode}" ${i === 0 ? "checked" : ""}>
-                <strong>${r.carrierCode || ""} ${r.serviceName || ""}</strong>
-                <span style="float:right;">${money(r.total)}</span>
-              </label>
-            `;
-          })
-          .join("");
-      } catch (e) {
-        console.error(e);
-        box.textContent = "Could not load rates. We will confirm shipping manually.";
-      }
-    }, 500);
-  }
-
-  ["shipAddr1", "shipCity", "shipState", "shipPostal", "shipCountry"].forEach((id) => {
-    const el = document.getElementById(id);
-    if (el) {
-      el.addEventListener("blur", scheduleRates);
-      el.addEventListener("change", scheduleRates);
-    }
-  });
+  totalEl.textContent = formatMoney(total);
 
   form.addEventListener("submit", (e) => {
     e.preventDefault();
     alert("Order request submitted. We will contact you to confirm pricing and shipping.");
     localStorage.removeItem(CART_KEY);
-    location.href = "products.html";
+    window.location.href = "products.html";
+  });
+}
+
+// ===== View modal with thumbnails =====
+
+function setupViewModal() {
+  const modal = document.getElementById("viewModal");
+  if (!modal) return;
+
+  const mainImg = document.getElementById("modalMainImg");
+  const titleEl = document.getElementById("modalTitle");
+  const skuEl = document.getElementById("modalSku");
+  const descEl = document.getElementById("modalDesc");
+  const thumbsContainer = document.getElementById("modalThumbs");
+
+  const productImages = {
+    dime353: [
+      "img/cue-cube-grey-353-1.jpg",
+      "img/cue-cube-grey-353-2.jpg",
+      "img/cue-cube-grey-353-3.jpg",
+    ],
+    nickel418: [
+      "img/cue-cube-grey-418-1.jpg",
+      "img/cue-cube-grey-418-2.jpg",
+      "img/cue-cube-grey-418-3.jpg",
+    ],
+    keychain: [
+      "img/cue-cube-keychain-418-1.jpg",
+      "img/cue-cube-keychain-418-2.jpg",
+      "img/cue-cube-keychain-418-3.jpg",
+    ],
+  };
+
+  function openModalForProduct(id) {
+    const card = document.querySelector(`.product-card[data-product-id="${id}"]`);
+    if (!card) return;
+
+    const name = card.querySelector(".product-name")?.textContent || "";
+    const sku = card.querySelector(".product-sku")?.textContent || "";
+    const desc = card.querySelector(".product-desc")?.textContent || "";
+
+    titleEl.textContent = name;
+    skuEl.textContent = sku;
+    descEl.textContent = desc;
+
+    const imgs = productImages[id] || [];
+    thumbsContainer.innerHTML = "";
+
+    if (imgs.length) {
+      mainImg.src = imgs[0];
+
+      imgs.forEach((src, index) => {
+        const img = document.createElement("img");
+        img.src = src;
+        img.className = "modal-thumb" + (index === 0 ? " active" : "");
+        img.addEventListener("click", () => {
+          mainImg.src = src;
+          thumbsContainer
+            .querySelectorAll(".modal-thumb")
+            .forEach((t) => t.classList.remove("active"));
+          img.classList.add("active");
+        });
+        thumbsContainer.appendChild(img);
+      });
+    } else {
+      mainImg.src = "";
+    }
+
+    modal.classList.add("show");
+  }
+
+  function closeModal() {
+    modal.classList.remove("show");
+  }
+
+  document.querySelectorAll(".view-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.productView;
+      openModalForProduct(id);
+    });
+  });
+
+  modal.querySelectorAll("[data-close-modal]").forEach((el) => {
+    el.addEventListener("click", closeModal);
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && modal.classList.contains("show")) {
+      closeModal();
+    }
   });
 }

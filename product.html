@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CueCube – Product</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="products-body">
+  <header class="topbar billiard-topbar">
+    <div class="topbar-left">
+      <div class="logo">CUECUBE <span>WHOLESALE</span></div>
+      <div class="topbar-info">Billiard accessories • Florida • Dealers only</div>
+    </div>
+    <div class="topbar-right">
+      <a href="products.html" class="logout">Back to catalog</a>
+    </div>
+  </header>
+
+  <main class="product-detail-page">
+    <div class="product-detail" id="productDetail">
+      <!-- filled by script.js -->
+    </div>
+
+    <aside class="cart-panel" id="cartPanel">
+      <h2>Wholesale order</h2>
+      <p class="cart-note">Selected items:</p>
+      <div id="cartItems" class="cart-items"></div>
+      <div class="cart-total">
+        <span>Total:</span>
+        <span id="cartTotal">$0.00</span>
+      </div>
+      <button class="cart-checkout" id="cartCheckout">Proceed to checkout (demo)</button>
+    </aside>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
